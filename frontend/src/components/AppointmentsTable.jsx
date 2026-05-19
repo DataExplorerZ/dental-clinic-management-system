@@ -1,4 +1,12 @@
 import {
+  Calendar,
+  Clock3,
+  Check,
+  X,
+  ChevronRight
+} from "lucide-react";
+
+import {
   updateAppointmentStatus
 } from "../services/appointmentService";
 
@@ -28,124 +36,205 @@ export default function AppointmentsTable({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden">
 
-      <table className="w-full">
+    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
 
-        <thead className="bg-gray-100">
+      <div className="px-6 py-5 border-b border-gray-100">
 
-          <tr>
+        <h2 className="text-2xl font-bold text-gray-800">
+          Appointment Schedule
+        </h2>
 
-            <th className="text-left p-4">
-              Patient ID
-            </th>
+        <p className="text-gray-500 text-sm mt-1">
+          View and manage clinic appointments.
+        </p>
 
-            <th className="text-left p-4">
-              Date
-            </th>
+      </div>
 
-            <th className="text-left p-4">
-              Time
-            </th>
+      <div className="overflow-x-auto">
 
-            <th className="text-left p-4">
-              Treatment
-            </th>
+        <table className="w-full">
 
-            <th className="text-left p-4">
-              Status
-            </th>
+          <thead className="bg-gray-50">
 
-            <th className="text-left p-4">
-              Actions
-            </th>
+            <tr>
 
-          </tr>
+              <th className="text-left px-6 py-5 text-sm font-semibold text-gray-500">
+                Patient
+              </th>
 
-        </thead>
+              <th className="text-left px-6 py-5 text-sm font-semibold text-gray-500">
+                Schedule
+              </th>
 
-        <tbody>
+              <th className="text-left px-6 py-5 text-sm font-semibold text-gray-500">
+                Treatment
+              </th>
 
-          {appointments.map((appointment) => (
+              <th className="text-left px-6 py-5 text-sm font-semibold text-gray-500">
+                Status
+              </th>
 
-            <tr
-              key={appointment.id}
-              className="border-t"
-            >
-
-              <td className="p-4">
-                {appointment.patient_id}
-              </td>
-
-              <td className="p-4">
-                {appointment.appointment_date}
-              </td>
-
-              <td className="p-4">
-                {appointment.appointment_time}
-              </td>
-
-              <td className="p-4">
-                {appointment.treatment_type}
-              </td>
-
-              <td className="p-4">
-
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    appointment.status ===
-                    "Completed"
-                      ? "bg-green-100 text-green-700"
-                      : appointment.status ===
-                        "Cancelled"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-blue-100 text-blue-700"
-                  }`}
-                >
-                  {appointment.status}
-                </span>
-
-              </td>
-
-              <td className="p-4">
-
-                <div className="flex gap-2">
-
-                  <button
-                    onClick={() =>
-                      handleStatusUpdate(
-                        appointment.id,
-                        "Completed"
-                      )
-                    }
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-                  >
-                    Complete
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      handleStatusUpdate(
-                        appointment.id,
-                        "Cancelled"
-                      )
-                    }
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                  >
-                    Cancel
-                  </button>
-
-                </div>
-
-              </td>
+              <th className="text-right px-6 py-5 text-sm font-semibold text-gray-500">
+                Actions
+              </th>
 
             </tr>
 
-          ))}
+          </thead>
 
-        </tbody>
+          <tbody>
 
-      </table>
+            {appointments.map((appointment) => (
+
+              <tr
+                key={appointment.id}
+                className="border-t border-gray-100 hover:bg-blue-50/30 transition-all duration-200"
+              >
+
+                {/* Patient */}
+
+                <td className="px-6 py-5">
+
+                  <div>
+
+                    <p className="font-semibold text-gray-800">
+                      Patient #{appointment.patient_id}
+                    </p>
+
+                    <p className="text-sm text-gray-500">
+                      Appointment ID #{appointment.id}
+                    </p>
+
+                  </div>
+
+                </td>
+
+                {/* Schedule */}
+
+                <td className="px-6 py-5">
+
+                  <div className="space-y-2">
+
+                    <div className="flex items-center gap-2 text-gray-700">
+
+                      <Calendar size={16} />
+
+                      {appointment.appointment_date}
+
+                    </div>
+
+                    <div className="flex items-center gap-2 text-gray-500 text-sm">
+
+                      <Clock3 size={15} />
+
+                      {appointment.appointment_time}
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                {/* Treatment */}
+
+                <td className="px-6 py-5">
+
+                  <span className="bg-purple-100 text-purple-700 px-4 py-2 rounded-2xl text-sm font-medium">
+
+                    {appointment.treatment_type}
+
+                  </span>
+
+                </td>
+
+                {/* Status */}
+
+                <td className="px-6 py-5">
+
+                  <span
+                    className={`px-4 py-2 rounded-2xl text-sm font-medium ${
+                      appointment.status === "Completed"
+                        ? "bg-green-100 text-green-700"
+                        : appointment.status === "Cancelled"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+
+                    {appointment.status}
+
+                  </span>
+
+                </td>
+
+                {/* Actions */}
+
+                <td className="px-6 py-5">
+
+                  <div className="flex justify-end gap-3">
+
+                    <button
+                      onClick={() =>
+                        handleStatusUpdate(
+                          appointment.id,
+                          "Completed"
+                        )
+                      }
+                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-2xl transition-all duration-200"
+                    >
+
+                      <Check size={16} />
+
+                      Complete
+
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        handleStatusUpdate(
+                          appointment.id,
+                          "Cancelled"
+                        )
+                      }
+                      className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-2xl transition-all duration-200"
+                    >
+
+                      <X size={16} />
+
+                      Cancel
+
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            ))}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      {appointments.length === 0 && (
+
+        <div className="py-20 text-center">
+
+          <div className="text-gray-400 text-lg">
+            No appointments found
+          </div>
+
+          <p className="text-gray-500 text-sm mt-2">
+            Schedule an appointment to get started.
+          </p>
+
+        </div>
+
+      )}
 
     </div>
   );
