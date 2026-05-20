@@ -14,7 +14,9 @@ from datetime import datetime
 
 from app.database.database import Base
 
+
 class Invoice(Base):
+
     __tablename__ = "invoices"
 
     id = Column(
@@ -38,14 +40,24 @@ class Invoice(Base):
         default="Unpaid"
     )
 
-    notes = Column(Text)
+    notes = Column(
+        Text,
+        nullable=True
+    )
+
+    next_visit_date = Column(
+        String,
+        nullable=True
+    )
 
     created_at = Column(
         DateTime,
         default=datetime.utcnow
     )
 
-    patient = relationship("Patient")
+    patient = relationship(
+        "Patient"
+    )
 
     items = relationship(
         "InvoiceItem",

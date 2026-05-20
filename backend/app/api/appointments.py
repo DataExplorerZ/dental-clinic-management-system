@@ -130,3 +130,29 @@ def get_patient_appointments(
     ).all()
 
     return appointments
+@router.put("/{appointment_id}/complete")
+def complete_appointment(
+    appointment_id: int,
+    db: Session = Depends(get_db)
+):
+
+    appointment = db.query(
+        Appointment
+    ).filter(
+        Appointment.id == appointment_id
+    ).first()
+
+    if not appointment:
+
+        return {
+            "error": "Appointment not found"
+        }
+
+    appointment.status = "Completed"
+
+    db.commit()
+
+    return {
+        "message":
+        "Appointment completed successfully"
+    }

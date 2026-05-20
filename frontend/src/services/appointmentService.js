@@ -44,3 +44,15 @@ export const updateAppointmentStatus =
 
     return response.data;
 };
+export const completeAppointment =
+  async (appointmentId) => {
+
+    const response =
+      await api.put(
+
+        `/appointments/${appointmentId}/complete`
+
+      );
+
+    return response.data;
+};

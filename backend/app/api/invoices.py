@@ -16,11 +16,14 @@ from app.models.invoice_item import (
 from app.schemas.invoice import (
     InvoiceCreate
 )
-from sqlalchemy import or_, String
+
 router = APIRouter(
     prefix="/invoices",
     tags=["Invoices"]
 )
+
+
+# CREATE INVOICE
 
 @router.post("/")
 def create_invoice(
@@ -34,10 +37,16 @@ def create_invoice(
     )
 
     new_invoice = Invoice(
+
         patient_id=invoice.patient_id,
+
         total_amount=total_amount,
+
         payment_status=invoice.payment_status,
-        notes=invoice.notes
+
+        notes=invoice.notes,
+
+        next_visit_date=invoice.next_visit_date
     )
 
     db.add(new_invoice)
@@ -49,8 +58,11 @@ def create_invoice(
     for item in invoice.items:
 
         invoice_item = InvoiceItem(
+
             invoice_id=new_invoice.id,
+
             treatment_name=item.treatment_name,
+
             amount=item.amount
         )
 
@@ -61,6 +73,9 @@ def create_invoice(
     return {
         "message": "Invoice created successfully"
     }
+
+
+# GET ALL INVOICES
 
 @router.get("/")
 def get_invoices(
@@ -127,6 +142,9 @@ def get_invoices(
                 "notes":
                     invoice.notes,
 
+                "next_visit_date":
+                    invoice.next_visit_date,
+
                 "created_at":
                     invoice.created_at,
 
@@ -146,6 +164,62 @@ def get_invoices(
             })
 
     return result
+
+@router.get("/patient/{patient_id}")
+def get_patient_invoices(
+    patient_id: int,
+    db: Session = Depends(get_db)
+):
+
+    invoices = db.query(
+        Invoice
+    ).filter(
+        Invoice.patient_id == patient_id
+    ).all()
+
+    result = []
+
+    for invoice in invoices:
+
+        result.append({
+
+            "id": invoice.id,
+
+            "patient_id":
+                invoice.patient_id,
+
+            "total_amount":
+                invoice.total_amount,
+
+            "payment_status":
+                invoice.payment_status,
+
+            "notes":
+                invoice.notes,
+
+            "next_visit_date":
+                invoice.next_visit_date,
+
+            "created_at":
+                invoice.created_at,
+
+            "items": [
+
+                {
+                    "treatment_name":
+                        item.treatment_name,
+
+                    "amount":
+                        item.amount
+                }
+
+                for item in invoice.items
+            ]
+        })
+
+    return result
+# GET SINGLE INVOICE
+
 @router.get("/{invoice_id}")
 def get_single_invoice(
     invoice_id: int,
@@ -157,6 +231,12 @@ def get_single_invoice(
     ).filter(
         Invoice.id == invoice_id
     ).first()
+
+    if not invoice:
+
+        return {
+            "message": "Invoice not found"
+        }
 
     return {
 
@@ -172,6 +252,9 @@ def get_single_invoice(
 
         "notes":
             invoice.notes,
+
+        "next_visit_date":
+            invoice.next_visit_date,
 
         "created_at":
             invoice.created_at,
@@ -190,9 +273,3 @@ def get_single_invoice(
 
         ]
     }
-
-    invoices = db.query(
-        Invoice
-    ).all()
-
-    return invoices

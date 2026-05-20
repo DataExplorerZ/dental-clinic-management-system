@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 
 import {
+  Plus,
+  Trash2,
+  Receipt,
+  CircleDollarSign
+} from "lucide-react";
+
+import {
   getPatients
 } from "../services/patientService";
 
@@ -38,6 +45,9 @@ export default function AddInvoiceForm({
   const [notes, setNotes] =
     useState("");
 
+  const [nextVisitDate, setNextVisitDate] =
+    useState("");
+
   const [patientId, setPatientId] =
     useState("");
 
@@ -55,7 +65,8 @@ export default function AddInvoiceForm({
 
       try {
 
-        const data = await getPatients();
+        const data =
+          await getPatients();
 
         setPatients(data);
 
@@ -74,9 +85,11 @@ export default function AddInvoiceForm({
     value
   ) => {
 
-    const updatedItems = [...items];
+    const updatedItems =
+      [...items];
 
-    updatedItems[index][field] = value;
+    updatedItems[index][field] =
+      value;
 
     setItems(updatedItems);
   };
@@ -137,10 +150,14 @@ export default function AddInvoiceForm({
 
         notes,
 
+        next_visit_date: nextVisitDate,
+
         items: formattedItems
       });
 
-      alert("Invoice created successfully");
+      alert(
+        "Invoice generated successfully"
+      );
 
       fetchInvoices();
 
@@ -149,6 +166,8 @@ export default function AddInvoiceForm({
       setPaymentStatus("Unpaid");
 
       setNotes("");
+
+      setNextVisitDate("");
 
       setItems([
         {
@@ -162,24 +181,56 @@ export default function AddInvoiceForm({
 
       console.error(error);
 
-      alert("Error creating invoice");
+      alert(
+        "Error generating invoice"
+      );
     }
   };
 
   return (
+
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-2xl shadow-md mb-6"
+      className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6"
     >
 
-      <h2 className="text-2xl font-bold mb-6">
-        Create Invoice
-      </h2>
+      {/* Header */}
 
-      <div className="mb-6">
+      <div className="flex items-center gap-4 mb-8">
+
+        <div className="bg-blue-100 p-4 rounded-2xl">
+
+          <Receipt
+            size={24}
+            className="text-blue-600"
+          />
+
+        </div>
+
+        <div>
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            Create Invoice
+          </h2>
+
+          <p className="text-gray-500 text-sm">
+            Generate patient invoices and billing records.
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Patient Selection */}
+
+      <div className="mb-8">
+
+        <label className="block text-sm font-medium text-gray-600 mb-3">
+          Select Patient
+        </label>
 
         <select
-          className="border p-3 rounded-lg w-full"
+          className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={patientId}
           onChange={(e) =>
             setPatientId(e.target.value)
@@ -206,90 +257,142 @@ export default function AddInvoiceForm({
 
       </div>
 
-      <div className="space-y-4">
+      {/* Invoice Items */}
+
+      <div className="space-y-5">
 
         {items.map((item, index) => (
 
           <div
             key={index}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 border p-4 rounded-xl"
+            className="border border-gray-200 rounded-3xl p-5 bg-gray-50"
           >
 
-            <select
-              className="border p-3 rounded-lg"
-              value={item.treatment_name}
-              onChange={(e) =>
-                handleItemChange(
-                  index,
-                  "treatment_name",
-                  e.target.value
-                )
-              }
-              required
-            >
+            <div className="flex justify-between items-center mb-5">
 
-              <option value="">
-                Select Treatment
-              </option>
+              <h3 className="font-semibold text-gray-700">
+                Treatment Item #{index + 1}
+              </h3>
 
-              {treatmentOptions.map(
-                (treatment, i) => (
+              {items.length > 1 && (
 
-                <option
-                  key={i}
-                  value={treatment}
+                <button
+                  type="button"
+                  onClick={() =>
+                    removeItem(index)
+                  }
+                  className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl transition-all"
                 >
-                  {treatment}
-                </option>
 
-              ))}
+                  <Trash2 size={16} />
 
-            </select>
+                  Remove
+
+                </button>
+
+              )}
+
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+              {/* Treatment */}
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-600 mb-3">
+                  Treatment Type
+                </label>
+
+                <select
+                  className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={item.treatment_name}
+                  onChange={(e) =>
+                    handleItemChange(
+                      index,
+                      "treatment_name",
+                      e.target.value
+                    )
+                  }
+                  required
+                >
+
+                  <option value="">
+                    Select Treatment
+                  </option>
+
+                  {treatmentOptions.map(
+                    (treatment, i) => (
+
+                    <option
+                      key={i}
+                      value={treatment}
+                    >
+                      {treatment}
+                    </option>
+
+                  ))}
+
+                </select>
+
+              </div>
+
+              {/* Amount */}
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-600 mb-3">
+                  Amount
+                </label>
+
+                <input
+                  type="number"
+                  placeholder="Enter amount"
+                  className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={item.amount}
+                  onChange={(e) =>
+                    handleItemChange(
+                      index,
+                      "amount",
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+              </div>
+
+            </div>
+
+            {/* Custom Treatment */}
 
             {item.treatment_name ===
               "Other" && (
 
-              <input
-                type="text"
-                placeholder="Custom Treatment"
-                className="border p-3 rounded-lg"
-                value={item.customTreatment}
-                onChange={(e) =>
-                  handleItemChange(
-                    index,
-                    "customTreatment",
-                    e.target.value
-                  )
-                }
-                required
-              />
+              <div className="mt-5">
+
+                <label className="block text-sm font-medium text-gray-600 mb-3">
+                  Custom Treatment
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Enter custom treatment"
+                  className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={item.customTreatment}
+                  onChange={(e) =>
+                    handleItemChange(
+                      index,
+                      "customTreatment",
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+              </div>
 
             )}
-
-            <input
-              type="number"
-              placeholder="Amount"
-              className="border p-3 rounded-lg"
-              value={item.amount}
-              onChange={(e) =>
-                handleItemChange(
-                  index,
-                  "amount",
-                  e.target.value
-                )
-              }
-              required
-            />
-
-            <button
-              type="button"
-              onClick={() =>
-                removeItem(index)
-              }
-              className="bg-red-500 text-white px-4 py-2 rounded-lg"
-            >
-              Remove
-            </button>
 
           </div>
 
@@ -297,26 +400,56 @@ export default function AddInvoiceForm({
 
       </div>
 
+      {/* Add Item Button */}
+
       <button
         type="button"
         onClick={addItem}
-        className="mt-6 bg-gray-200 px-6 py-3 rounded-lg"
+        className="mt-6 flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700 px-5 py-3 rounded-2xl transition-all"
       >
-        + Add Item
+
+        <Plus size={18} />
+
+        Add Treatment Item
+
       </button>
 
-      <div className="mt-6 text-2xl font-bold">
+      {/* Total */}
 
-        Total:
-        {" "}
-        Rs. {calculateTotal()}
+      <div className="mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 text-white">
+
+        <div className="flex items-center gap-3 mb-4">
+
+          <CircleDollarSign size={28} />
+
+          <h3 className="text-2xl font-bold">
+            Invoice Summary
+          </h3>
+
+        </div>
+
+        <div className="text-5xl font-bold">
+
+          Rs. {calculateTotal()}
+
+        </div>
+
+        <p className="text-blue-100 mt-2">
+          Total invoice amount
+        </p>
 
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      {/* Payment Status */}
+
+      <div className="mt-8">
+
+        <label className="block text-sm font-medium text-gray-600 mb-3">
+          Payment Status
+        </label>
 
         <select
-          className="border p-3 rounded-lg"
+          className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={paymentStatus}
           onChange={(e) =>
             setPaymentStatus(
@@ -337,19 +470,52 @@ export default function AddInvoiceForm({
 
       </div>
 
-      <textarea
-        placeholder="Notes"
-        className="border p-3 rounded-lg w-full mt-6"
-        rows="4"
-        value={notes}
-        onChange={(e) =>
-          setNotes(e.target.value)
-        }
-      />
+      {/* Next Visit Date */}
+
+      <div className="mt-8">
+
+        <label className="block text-sm font-medium text-gray-600 mb-3">
+          Recommended Next Visit
+        </label>
+
+        <input
+          type="date"
+          value={nextVisitDate}
+          onChange={(e) =>
+            setNextVisitDate(
+              e.target.value
+            )
+          }
+          className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+      </div>
+
+      {/* Notes */}
+
+      <div className="mt-8">
+
+        <label className="block text-sm font-medium text-gray-600 mb-3">
+          Additional Notes
+        </label>
+
+        <textarea
+          placeholder="Enter invoice notes..."
+          className="w-full border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          rows="5"
+          value={notes}
+          onChange={(e) =>
+            setNotes(e.target.value)
+          }
+        />
+
+      </div>
+
+      {/* Submit */}
 
       <button
         type="submit"
-        className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+        className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-semibold transition-all duration-200 shadow-lg"
       >
         Generate Invoice
       </button>

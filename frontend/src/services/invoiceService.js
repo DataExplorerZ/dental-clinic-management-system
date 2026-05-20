@@ -32,3 +32,13 @@ export const getSingleInvoice =
 
     return response.data;
 };
+export const getPatientInvoices =
+  async (patientId) => {
+
+    const response =
+      await api.get(
+        `/invoices/patient/${patientId}`
+      );
+
+    return response.data;
+};

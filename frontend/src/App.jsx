@@ -65,8 +65,12 @@ export default function App() {
           }
         />
         <Route
-          path="/invoice-preview/:id"
-          element={<InvoicePreview />}
+          path="/invoices/:id"
+          element={
+            <ProtectedRoute>
+              <InvoicePreview />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </BrowserRouter>
