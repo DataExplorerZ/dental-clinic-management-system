@@ -21,7 +21,7 @@ import PatientInvoices from "../components/PatientInvoices";
 
 import {
   getPatientMedicalHistory
-} from "../services/medicalRecordService";
+} from "../services/MedicalRecordService";
 
 import {
   getPatients
