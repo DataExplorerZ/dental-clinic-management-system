@@ -3,10 +3,7 @@ import {
   useState
 } from "react";
 
-import {
-  createMedicalRecord
-} from "../services/medicalRecordService";
-
+import { createMedicalRecord } from "../services/MedicalRecordService";
 import {
   getPatientAppointments,
   completeAppointment
